@@ -37,7 +37,32 @@ namespace tumblrAppWPF
         {
             InitializeComponent();
 
-            var req = WebRequest.Create(url + domain + "/posts/photo?api_key=" + api_key);
+            RequestNewImages();
+
+            image1.Source = images[index];
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            index--;
+            if (index < 0) index = 0;
+            image1.Source = images[index];
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            index++;
+            if (index % 20 == 0) RequestNewImages();
+            image1.Source = images[index];
+        }
+
+        public void RequestNewImages()
+        {
+            var req = WebRequest.Create(url + domain + "/posts/photo?api_key=" + api_key + "&offset=" + index);
             var stream = req.GetResponse().GetResponseStream();
 
             //JSON出力
@@ -58,30 +83,6 @@ namespace tumblrAppWPF
                     //var imgStream = imgReq.GetResponse().GetResponseStream();
                 }
             }
-
-            image1.Source = images[index];
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            index--;
-            if (index < 0) index = 0;
-            image1.Source = images[index];
-        }
-
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            index++;
-            if (index % 20 == 0) index = 0;
-            image1.Source = images[index];
-        }
-
-        public void RequestNewImages()
-        {
         }
     }
     
