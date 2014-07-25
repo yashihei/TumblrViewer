@@ -36,63 +36,52 @@ namespace tumblrAppWPF
         public MainWindow()
         {
             InitializeComponent();
-        }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            //var json = (new WebClient() { Encoding = Encoding.UTF8 }).DownloadString(url + domain + "/posts/photo?api_key=" + api_key);
-            //var json = (new WebClient() { Encoding = Encoding.UTF8 }).DownloadString("http://b.hatena.ne.jp/entry/jsonlite/?url=http://google.com");
-
-            //var req = WebRequest.Create(blog);
-            //var req = (HttpWebRequest)WebRequest.Create(blog);
-            //req.Headers.Add("Accept-Language:ja,en-US;q=0.8,en;q=0.6");
             var req = WebRequest.Create(url + domain + "/posts/photo?api_key=" + api_key);
             var stream = req.GetResponse().GetResponseStream();
 
-            //var serializer = new DataContractJsonSerializer(typeof(TumblrPost));
-            //TumblrPost result = (TumblrPost)serializer.ReadObject(stream);
-            
             //JSON出力
             using (var sr = new StreamReader(stream))
             {
-                var sw = new StreamWriter("out.txt");
                 var json = sr.ReadToEnd();
-
-                //using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(json))) {
-                //    var data = (TumblrPost)serializer.ReadObject(ms);
-                //}
-                
-                //sw.WriteLine(sr.ReadToEnd());
-                //sw.Write(json);
 
                 //Console.Write(json);
 
-                var result = JsonConvert.DeserializeObject<TumblrPost>(json);
-                //Console.WriteLine(result.response.posts);
-                
-                foreach (var post in result.response.posts) {
+                var result = JsonConvert.DeserializeObject<TumblrPost>(json);//jsonをパース
+
+                foreach (var post in result.response.posts)
+                {
                     String imgUrl = post.photos[0].original_size.url;
                     Console.WriteLine(imgUrl);
                     images.Add(new BitmapImage(new Uri(imgUrl)));
                     //var imgReq = WebRequest.Create(post.photos[0].original_size.url);
                     //var imgStream = imgReq.GetResponse().GetResponseStream();
                 }
-
-                //Console.WriteLine(result);
-                //Console.WriteLine(sr.ReadToEnd());
             }
+
+            image1.Source = images[index];
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             index--;
+            if (index < 0) index = 0;
             image1.Source = images[index];
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             index++;
+            if (index % 20 == 0) index = 0;
             image1.Source = images[index];
+        }
+
+        public void RequestNewImages()
+        {
         }
     }
     
