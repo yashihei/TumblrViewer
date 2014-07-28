@@ -16,8 +16,7 @@ using System.Net;
 using System.IO;
 
 using Newtonsoft.Json;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
+using WpfAnimatedGif;
 
 namespace tumblrAppWPF
 {
@@ -30,7 +29,6 @@ namespace tumblrAppWPF
         string api_key = "GesVlVXWDOv1DKzVowf2jqsY8ndlgag0Uxy8HlLzN8AXAYd8FE";
         string url = "http://api.tumblr.com/v2/blog/";
 
-        Image img;
         List<BitmapImage> images = new List<BitmapImage>();
         int index = 0;
 
@@ -51,29 +49,42 @@ namespace tumblrAppWPF
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             index--;
-            if (index < 0) index = 0;
-            image1.Source = images[index];
+            SlideImage();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             index++;
-            if (index % 10 == 0) RequestNewImages();//10枚毎に読み込む
-            image1.Source = images[index];
+            SlideImage();
         }
 
-        public void RequestNewImages()
+        private void SlideImage()
         {
-            //if (images.Count() < index) return;
+            if (index < 0) index = 0;
+            else if (index % 10 == 0) RequestNewImages();//FIXME:10枚毎に読み込む
+
+            if (images[index].UriSource.ToString().IndexOf(".gif") > 0)
+            {
+                image1.SetValue(ImageBehavior.AnimatedSourceProperty, images[index]);
+            }
+            else
+            {
+                image1.ClearValue(ImageBehavior.AnimatedSourceProperty);
+                image1.Source = images[index];
+            }
+        }
+        
+        private void RequestNewImages()
+        {
+            //if (images.Count() < index + 1) return;
 
             var req = WebRequest.Create(url + domain + "/posts/photo?api_key=" + api_key + "&offset=" + index + "&limit=10");
             var stream = req.GetResponse().GetResponseStream();
 
-            //JSON出力
+            //JSON
             using (var sr = new StreamReader(stream))
             {
-                var json = sr.ReadToEnd();
-
+                String json = sr.ReadToEnd();
                 //Console.Write(json);
 
                 var result = JsonConvert.DeserializeObject<TumblrPost>(json);//jsonをパース
@@ -82,12 +93,10 @@ namespace tumblrAppWPF
                 {
                     String imgUrl = post.photos[0].original_size.url;
                     Console.WriteLine(imgUrl);
-                    if (imgUrl.IndexOf("gif") > 0)
-                    {
-                    }
-                    images.Add(new BitmapImage(new Uri(imgUrl)));
-                    //var imgReq = WebRequest.Create(post.photos[0].original_size.url);
-                    //var imgStream = imgReq.GetResponse().GetResponseStream();
+
+                    var image = new BitmapImage(new Uri(imgUrl));
+
+                    images.Add(image);
                 }
             }
         }
