@@ -5,7 +5,7 @@
         Title="TumblrViewer" Height="450" Width="680" KeyDown="Window_KeyDown">
     <Grid>
         <Image Name="image1" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" UseLayoutRounding="False" />
-        <Button Content="Save" HorizontalAlignment="Center" Margin="1,0,0,10" VerticalAlignment="Bottom" Width="75" RenderTransformOrigin="0.253,0.559" Click="Button_Click" Opacity="0.705"/>
+        <Button Content="Save" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom" Width="75" RenderTransformOrigin="0.253,0.559" Click="Button_Click" Opacity="0.705"/>
         <Button Content="&gt;" HorizontalAlignment="Center" Margin="120,0,0,10" VerticalAlignment="Bottom" Width="30" MinWidth="0" Click="Button_Click_2" Opacity="0.7"/>
         <Button Content="&lt;" HorizontalAlignment="Center" Margin="0,0,120,10" VerticalAlignment="Bottom" Width="30" MinWidth="0" Click="Button_Click_1" Opacity="0.7"/>
     </Grid>

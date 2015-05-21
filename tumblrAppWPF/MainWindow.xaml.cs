@@ -16,7 +16,6 @@ using System.Net;
 using System.IO;
 
 using Newtonsoft.Json;
-using WpfAnimatedGif;
 
 namespace tumblrAppWPF
 {
@@ -31,6 +30,7 @@ namespace tumblrAppWPF
 
         List<BitmapImage> images = new List<BitmapImage>();
         int index = 0;
+        int forward_index = 0;
 
         public MainWindow()
         {
@@ -43,62 +43,55 @@ namespace tumblrAppWPF
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //images[index]
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             index--;
+            if (index < 0) index = 0;
             SlideImage();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             index++;
+            if (index > forward_index) index = forward_index;
             SlideImage();
         }
 
         private void SlideImage()
         {
-            if (index < 0) index = 0;
-            else if (index % 10 == 0) RequestNewImages();//FIXME:10枚毎に読み込む
+            if (forward_index - index < 5)
+            {
+                RequestNewImages();
+            }
 
-            if (images[index].UriSource.ToString().IndexOf(".gif") > 0)
-            {
-                image1.SetValue(ImageBehavior.AnimatedSourceProperty, images[index]);
-            }
-            else
-            {
-                image1.ClearValue(ImageBehavior.AnimatedSourceProperty);
-                image1.Source = images[index];
-            }
+            image1.Source = images[index];
         }
         
         private void RequestNewImages()
         {
-            //if (images.Count() < index + 1) return;
-
-            var req = WebRequest.Create(url + domain + "/posts/photo?api_key=" + api_key + "&offset=" + index + "&limit=10");
+            var req = WebRequest.Create(url + domain + "/posts/photo?api_key=" + api_key + "&offset=" + forward_index + "&limit=10");
             var stream = req.GetResponse().GetResponseStream();
 
             //JSON
             using (var sr = new StreamReader(stream))
             {
                 String json = sr.ReadToEnd();
-                //Console.Write(json);
 
                 var result = JsonConvert.DeserializeObject<TumblrPost>(json);//jsonをパース
 
                 foreach (var post in result.response.posts)
                 {
                     String imgUrl = post.photos[0].original_size.url;
-                    Console.WriteLine(imgUrl);
 
                     var image = new BitmapImage(new Uri(imgUrl));
 
                     images.Add(image);
                 }
             }
+
+            forward_index += 10;
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
